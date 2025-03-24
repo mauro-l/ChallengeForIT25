@@ -1,0 +1,2 @@
+2025-03-23 16:55:59 [error]: Status: 400 [POST] /api/task - Message: Unexpected token e in JSON at position 17
+2025-03-23 16:57:26 [error]: Status: 500 [POST] /api/task - Message: __dirname is not defined
