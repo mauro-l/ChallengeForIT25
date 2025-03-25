@@ -25,10 +25,69 @@ export function TodoProvider({ children }) {
     }
   };
 
-  const toggleComplete = ({ id, completed }) => {
-    setTasksFetch((prevTask) =>
-      prevTask.map((task) => (task.id === id ? { ...task, completed } : task))
-    );
+  const getOne = async (id) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const res = await fetch(`${baseUrl}/${id}`);
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.log(errorText);
+        throw new Error(`HTTP error! status: ${res.status} - ${errorText}`);
+      }
+
+      const data = await res.json();
+
+      if (data.status === "success") {
+        return { success: true, payload: data };
+      } else {
+        throw new Error(data.message || "Failed to get task");
+      }
+    } catch (err) {
+      setError(err.message || "An error occurred");
+      return { success: false, message: err.message || "An error occurred" };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleComplete = async ({ id, completed }) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const data = {
+        completed: completed,
+      };
+
+      const res = await fetch(`${baseUrl}/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.log(errorText);
+        throw new Error(`HTTP error! status: ${res.status} - ${errorText}`);
+      }
+
+      const result = await res.json();
+
+      if (result.status === "success") {
+        getAll();
+        return { success: true, message: "Task completed successfully" };
+      } else {
+        throw new Error(result.message || "Failed to update task");
+      }
+    } catch (err) {
+      setError(err.message || "An error occurred");
+      return { success: false, message: err.message || "An error occurred" };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const removeTask = async (id) => {
@@ -88,6 +147,35 @@ export function TodoProvider({ children }) {
     }
   };
 
+  const updateTask = async (id, data) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch(`${baseUrl}/${id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`HTTP error! status: ${res.status} - ${errorText}`);
+      }
+      const result = await res.json();
+      if (result.status === "success") {
+        getAll();
+        return { success: true, message: "Task update successfully" };
+      } else {
+        throw new Error(result.message || "Failed to update task");
+      }
+    } catch (err) {
+      setError(err);
+      return { success: false, message: err.message || "An error occurred" };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <TodoContext.Provider
       value={{
@@ -97,6 +185,8 @@ export function TodoProvider({ children }) {
         toggleComplete,
         removeTask,
         addTask,
+        getOne,
+        updateTask,
       }}
     >
       {children}

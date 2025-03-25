@@ -36,5 +36,9 @@ export const updateTaskSchema = {
       .optional(),
     completed: z.boolean().optional(),
   }),
-  params: idSchema,
+  params: z.object({
+    id: z
+      .string()
+      .length(9, { message: "ID must be exactly 9 characters long" }),
+  }),
 };

@@ -6,7 +6,13 @@ import { useTodo } from "../../context/TodoContext.jsx";
 function TaskForm({ setFormTask }) {
   const [hasContent, setHasContent] = useState(false);
   const { addTask } = useTodo();
-  const { register, handleSubmit, watch, reset } = useForm({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       title: "",
       description: "",
@@ -51,9 +57,20 @@ function TaskForm({ setFormTask }) {
             type="text"
             id="title"
             className="w-full bg-transparent border-none outline-none"
-            {...register("title")}
+            {...register("title", {
+              required: "El título es obligatorio",
+              minLength: {
+                value: 3,
+                message: "El título debe tener al menos 3 caracteres",
+              },
+              maxLength: {
+                value: 50,
+                message: "El título no puede tener más de 50 caracteres",
+              },
+            })}
           />
         </div>
+
         <div className="flex flex-row gap-2 px-4 rounded-md select-none bg-black/25 backdrop-blur-sm">
           <label htmlFor="description">Descripción:</label>
           <textarea
@@ -65,9 +82,25 @@ function TaskForm({ setFormTask }) {
               e.target.style.height = "auto";
               e.target.style.height = e.target.scrollHeight + "px";
             }}
-            {...register("description")}
+            {...register("description", {
+              required: "La descripción es obligatoria",
+              minLength: {
+                value: 10,
+                message: "La descripción debe tener al menos 10 caracteres",
+              },
+              maxLength: {
+                value: 250,
+                message: "La descripción no puede tener más de 250 caracteres",
+              },
+            })}
           ></textarea>
         </div>
+        {errors.title && (
+          <p className="text-sm text-red-500">{errors.title.message}</p>
+        )}
+        {errors.description && (
+          <p className="text-sm text-red-500">{errors.description.message}</p>
+        )}
       </div>
       <button
         type={hasContent ? "submit" : "button"}

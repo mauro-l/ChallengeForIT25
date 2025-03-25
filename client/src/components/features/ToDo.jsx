@@ -2,16 +2,20 @@ import { Trash2 } from "lucide-react";
 import { useModal } from "../../context/ModalContext.jsx";
 import { useTodo } from "../../context/TodoContext.jsx";
 
-export const Todo = ({ task, onToggleComplete }) => {
+export const Todo = ({ task }) => {
   const { id, title, description, completed } = task;
 
-  const { removeTask, error } = useTodo();
+  const { removeTask, toggleComplete, error } = useTodo();
 
-  const handleChangeCheckbox = (event) => {
-    onToggleComplete({
+  const handleToggleComplete = async (event) => {
+    const result = await toggleComplete({
       id,
       completed: event.target.checked,
     });
+
+    if (!result.success) {
+      alert(`Error: ${error}`);
+    }
   };
 
   const handleRemove = async ({ id }) => {
@@ -32,7 +36,7 @@ export const Todo = ({ task, onToggleComplete }) => {
           className="me-2 checkbox"
           checked={completed}
           type="checkbox"
-          onChange={handleChangeCheckbox}
+          onChange={handleToggleComplete}
         />
         <label>
           <button onClick={() => openModal(id)} className="text-start">

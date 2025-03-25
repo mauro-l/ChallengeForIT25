@@ -26,18 +26,6 @@ function TaskList() {
     setFormTask(true);
   };
 
-  const handleCompleted = ({ id, completed }) => {
-    const newTasks = tasks.map((task) => {
-      if (task.id === id) {
-        return {
-          ...task,
-          completed,
-        };
-      }
-      return task;
-    });
-    setTasks(newTasks);
-  };
   if (loading) return <h2>Cargando...</h2>;
   return (
     <section className="w-1/2 h-full p-5 mx-auto text-white border-2 border-white/5 rounded-xl bg-black/25 backdrop-blur-sm">
@@ -78,7 +66,7 @@ function TaskList() {
         >
           <TaskForm setFormTask={setFormTask} />
         </div>
-        <TaskCard onToggleComplete={handleCompleted} todos={tasks} />
+        <TaskCard todos={tasks} />
       </article>
       <Footer items={tasks} allItems={allTask} />
     </section>
