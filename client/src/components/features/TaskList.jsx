@@ -1,27 +1,26 @@
 import { useEffect, useState } from "react";
 import TaskCard from "./TaskCard.jsx";
 import Footer from "../layout/Footer.jsx";
-import { SquarePlus } from "lucide-react";
+import { ClipboardPlus, LogOut, Search } from "lucide-react";
 import TaskForm from "./TaskForm.jsx";
 import { useTodo } from "../../context/TodoContext.jsx";
 
 function TaskList() {
   const { tasksFetch, loading } = useTodo();
   const [tasks, setTasks] = useState([]);
+  const [allTask, setAllTasks] = useState([]);
   const [formTask, setFormTask] = useState(false);
 
   useEffect(() => {
     if (!loading && tasksFetch) {
-      setTasks(tasksFetch);
+      setAllTasks(tasksFetch);
+
+      const pendingTask = tasksFetch.filter((t) => !t.completed);
+      setTasks(pendingTask);
     }
   }, [loading, tasksFetch]);
 
   const userName = localStorage.getItem("nombreUsuario");
-
-  const handleRemove = ({ id }) => {
-    const newTask = tasks.filter((task) => task.id !== id);
-    setTasks(newTask);
-  };
 
   const formNewTask = () => {
     setFormTask(true);
@@ -47,13 +46,29 @@ function TaskList() {
           <h2 className="pt-3 text-4xl">Todo List App</h2>
           <h3 className="py-2 text-lg">Bienvenido, {userName} 😺</h3>
         </div>
-        <button
-          className="flex items-center gap-2 px-4 m-4 border border-transparent rounded-md select-none backdrop-blur-sm"
-          onClick={formNewTask}
-        >
-          <SquarePlus size={32} />
-          Nueva tarea
-        </button>
+        <div className="flex flex-col items-end gap-2 m-6 my-4 justify-top">
+          <ul className="text-xs bg-transparent menu menu-horizontal backdrop-blur-sm rounded-box">
+            <li>
+              <button
+                onClick={formNewTask}
+                className="tooltip tooltip-top"
+                data-tip="Nueva Tarea"
+              >
+                <ClipboardPlus size={16} />
+              </button>
+            </li>
+            <li>
+              <button className="tooltip tooltip-top" data-tip="Buscar">
+                <Search size={16} />
+              </button>
+            </li>
+            <li>
+              <button className="tooltip tooltip-top" data-tip="Salir">
+                <LogOut size={16} />
+              </button>
+            </li>
+          </ul>
+        </div>
       </article>
       <article className="overflow-y-scroll h-3/4">
         <div
@@ -63,13 +78,9 @@ function TaskList() {
         >
           <TaskForm setFormTask={setFormTask} />
         </div>
-        <TaskCard
-          onToggleComplete={handleCompleted}
-          onRemoveTodo={handleRemove}
-          todos={tasks}
-        />
+        <TaskCard onToggleComplete={handleCompleted} todos={tasks} />
       </article>
-      <Footer />
+      <Footer items={tasks} allItems={allTask} />
     </section>
   );
 }

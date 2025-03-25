@@ -1,7 +1,7 @@
 import React from "react";
 import { Todo } from "./ToDo.jsx";
 
-function TaskCard({ todos, onRemoveTodo, onToggleComplete }) {
+function TaskCard({ todos, onToggleComplete }) {
   const classCompleted = "text-white/50 line-through bg-white/10";
   return (
     <ul>
@@ -12,15 +12,7 @@ function TaskCard({ todos, onRemoveTodo, onToggleComplete }) {
             todo.completed ? classCompleted : ""
           }`}
         >
-          <Todo
-            key={todo.id}
-            id={todo.id}
-            title={todo.title}
-            description={todo.description}
-            completed={todo.completed}
-            onToggleComplete={onToggleComplete}
-            onRemoveTodo={onRemoveTodo}
-          />
+          <Todo task={todo} onToggleComplete={onToggleComplete} />
         </li>
       ))}
     </ul>

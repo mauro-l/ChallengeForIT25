@@ -1,9 +1,11 @@
 import { Send, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useTodo } from "../../context/TodoContext.jsx";
 
 function TaskForm({ setFormTask }) {
   const [hasContent, setHasContent] = useState(false);
+  const { addTask } = useTodo();
   const { register, handleSubmit, watch, reset } = useForm({
     defaultValues: {
       title: "",
@@ -18,10 +20,22 @@ function TaskForm({ setFormTask }) {
     setHasContent(title.trim() !== "" || description.trim() !== "");
   }, [title, description]);
 
-  const onSubmit = (data) => {
-    console.log(data);
-    setFormTask(false);
-    reset();
+  const onSubmit = async (data) => {
+    const newTask = {
+      title: data.title,
+      description: data.description,
+      completed: false,
+    };
+
+    const res = await addTask(newTask);
+
+    if (res.success) {
+      setFormTask(false);
+      reset();
+      alert(res.message);
+    } else {
+      alert(`Error: ${res.message}`);
+    }
   };
 
   const handleCancel = () => {
@@ -31,7 +45,7 @@ function TaskForm({ setFormTask }) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex w-full gap-4">
       <div className="flex flex-col w-full gap-2">
-        <div className="flex flex-row gap-2 px-4 border-2 rounded-md select-none border-white/40 bg-black/25 backdrop-blur-sm">
+        <div className="flex flex-row gap-2 px-4 rounded-md select-none bg-black/25 backdrop-blur-sm">
           <label htmlFor="title">Título:</label>
           <input
             type="text"
@@ -40,7 +54,7 @@ function TaskForm({ setFormTask }) {
             {...register("title")}
           />
         </div>
-        <div className="flex flex-row gap-2 px-4 border-2 rounded-md select-none border-white/40 bg-black/25 backdrop-blur-sm">
+        <div className="flex flex-row gap-2 px-4 rounded-md select-none bg-black/25 backdrop-blur-sm">
           <label htmlFor="description">Descripción:</label>
           <textarea
             id="description"

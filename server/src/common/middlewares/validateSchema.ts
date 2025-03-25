@@ -4,6 +4,7 @@ import { ZodSchema } from "zod";
 type SchemaType = {
   body?: ZodSchema<any>;
   query?: ZodSchema<any>;
+  params?: ZodSchema<any>;
 };
 
 export const validateSchema = (schema: SchemaType) => {
@@ -31,12 +32,25 @@ export const validateSchema = (schema: SchemaType) => {
       if (!result.success) {
         errors.push(
           ...result.error.errors.map((err: { path: any[]; message: any }) => ({
-            field: `body.${err.path.join(".")}`,
+            field: `query.${err.path.join(".")}`,
             message: err.message,
           }))
         );
       }
     }
+
+    if (schema.params) {
+      const result = schema.params.safeParse(req.params);
+      if (!result.success) {
+        errors.push(
+          ...result.error.errors.map((err: { path: any[]; message: any }) => ({
+            field: `params.${err.path.join(".")}`,
+            message: err.message,
+          }))
+        );
+      }
+    }
+
     if (errors.length > 0) {
       res.status(400).json({ errors });
       return;
