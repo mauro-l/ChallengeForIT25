@@ -2,9 +2,11 @@ import { Send, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTodo } from "../../context/TodoContext.jsx";
+import { useAlert } from "../../context/AlertContext.jsx";
 
 function TaskForm({ setFormTask }) {
   const [hasContent, setHasContent] = useState(false);
+  const { showAlert } = useAlert();
   const { addTask } = useTodo();
   const {
     register,
@@ -38,9 +40,9 @@ function TaskForm({ setFormTask }) {
     if (res.success) {
       setFormTask(false);
       reset();
-      alert(res.message);
+      showAlert("success", "Tarea creada con exito!");
     } else {
-      alert(`Error: ${res.message}`);
+      showAlert("error", "Problemas al crear la tarea");
     }
   };
 

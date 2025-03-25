@@ -1,10 +1,11 @@
 import { Trash2 } from "lucide-react";
 import { useModal } from "../../context/ModalContext.jsx";
 import { useTodo } from "../../context/TodoContext.jsx";
+import { useAlert } from "../../context/AlertContext.jsx";
 
 export const Todo = ({ task }) => {
   const { id, title, description, completed } = task;
-
+  const { showAlert } = useAlert();
   const { removeTask, toggleComplete, error } = useTodo();
 
   const handleToggleComplete = async (event) => {
@@ -14,7 +15,7 @@ export const Todo = ({ task }) => {
     });
 
     if (!result.success) {
-      alert(`Error: ${error}`);
+      showAlert("error", `Error: ${error}`);
     }
   };
 
@@ -22,9 +23,9 @@ export const Todo = ({ task }) => {
     const result = await removeTask(id);
 
     if (result.success) {
-      alert(result.message);
+      showAlert("success", result.message);
     } else {
-      alert(`Error: ${error}`);
+      showAlert("error", `Error: ${error}`);
     }
   };
 
