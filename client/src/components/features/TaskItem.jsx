@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useModal } from "../../context/ModalContext.jsx";
 import { Pencil, Undo2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import ButtonForm from "../common/ButtonForm.jsx";
-import { useTodo } from "../../context/TodoContext.jsx";
+import { TodoContext } from "../../context/TodoContext.jsx";
 import baseUrl from "../../services/config.js";
 import { format } from "date-fns";
 
@@ -13,7 +13,7 @@ function TaskItem() {
   const [isLoading, setIsLoading] = useState(false);
   const [taskDetail, setTaskDetail] = useState();
   /* const [formattedDate, setFormattedDate] = useState(); */
-  const { updateTask, error } = useTodo();
+  const { updateTask, error } = useContext(TodoContext);
 
   const {
     register,

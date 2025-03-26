@@ -1,12 +1,15 @@
 import { Trash2 } from "lucide-react";
 import { useModal } from "../../context/ModalContext.jsx";
-import { useTodo } from "../../context/TodoContext.jsx";
+import { TodoContext } from "../../context/TodoContext.jsx";
 import { useAlert } from "../../context/AlertContext.jsx";
+import { useContext } from "react";
 
 export const Todo = ({ task }) => {
   const { id, title, description, completed } = task;
   const { showAlert } = useAlert();
-  const { removeTask, toggleComplete, error } = useTodo();
+  const { openModal } = useModal();
+
+  const { removeTask, toggleComplete, error } = useContext(TodoContext);
 
   const handleToggleComplete = async (event) => {
     const result = await toggleComplete({
@@ -29,7 +32,6 @@ export const Todo = ({ task }) => {
     }
   };
 
-  const { openModal } = useModal();
   return (
     <div className="flex items-center justify-between gap-2 p-1">
       <div className="flex items-center gap-2">

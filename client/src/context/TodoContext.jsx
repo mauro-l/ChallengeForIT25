@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
 import baseUrl from "../services/config.js";
 
 const TodoContext = createContext();
@@ -7,6 +7,7 @@ export function TodoProvider({ children }) {
   const [tasksFetch, setTasksFetch] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filter, setFilter] = useState("all");
 
   useEffect(() => {
     getAll();
@@ -24,6 +25,18 @@ export function TodoProvider({ children }) {
       setLoading(false);
     }
   };
+
+  const filteredTask = useMemo(() => {
+    switch (filter) {
+      case "completed":
+        return tasksFetch.filter((t) => t.completed);
+      case "pending":
+        return tasksFetch.filter((t) => !t.completed);
+
+      default:
+        return tasksFetch;
+    }
+  }, [tasksFetch, filter]);
 
   const getOne = async (id) => {
     try {
@@ -180,8 +193,10 @@ export function TodoProvider({ children }) {
     <TodoContext.Provider
       value={{
         tasksFetch,
+        filteredTask,
         loading,
         error,
+        setFilter,
         toggleComplete,
         removeTask,
         addTask,
@@ -194,10 +209,4 @@ export function TodoProvider({ children }) {
   );
 }
 
-export function useTodo() {
-  const context = useContext(TodoContext);
-  if (context === undefined) {
-    throw new Error("useTodo debe ser usado dentro de un TodoProvider");
-  }
-  return context;
-}
+export { TodoContext };

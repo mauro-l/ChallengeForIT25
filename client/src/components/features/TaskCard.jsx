@@ -1,8 +1,14 @@
 import React from "react";
 import { Todo } from "./ToDo.jsx";
+import CardSkeleton from "../utils/CardSkeleton.jsx";
 
-function TaskCard({ todos }) {
+function TaskCard({ todos, loading }) {
   const classCompleted = "text-white/50 line-through bg-white/10";
+
+  if (loading) {
+    return <CardSkeleton />;
+  }
+
   return (
     <ul>
       {todos.map((todo) => (

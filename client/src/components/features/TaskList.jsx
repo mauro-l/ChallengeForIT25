@@ -1,24 +1,26 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import TaskCard from "./TaskCard.jsx";
 import Footer from "../layout/Footer.jsx";
 import { ClipboardPlus, LogOut, Search } from "lucide-react";
 import TaskForm from "./TaskForm.jsx";
-import { useTodo } from "../../context/TodoContext.jsx";
+import { TodoContext } from "../../context/TodoContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 function TaskList() {
-  const { tasksFetch, loading } = useTodo();
+  const { tasksFetch, loading } = useContext(TodoContext);
   const [tasks, setTasks] = useState([]);
   const [allTask, setAllTasks] = useState([]);
   const [formTask, setFormTask] = useState(false);
 
+  const navigate = useNavigate();
   useEffect(() => {
-    if (!loading && tasksFetch) {
+    if (!loading) {
       setAllTasks(tasksFetch);
 
       const pendingTask = tasksFetch.filter((t) => !t.completed);
       setTasks(pendingTask);
     }
-  }, [loading, tasksFetch]);
+  }, [tasksFetch]);
 
   const userName = localStorage.getItem("nombreUsuario");
 
@@ -26,7 +28,11 @@ function TaskList() {
     setFormTask(true);
   };
 
-  if (loading) return <h2>Cargando...</h2>;
+  const handleLogout = () => {
+    localStorage.removeItem("nombreUsuario");
+    navigate("/");
+  };
+
   return (
     <section className="w-1/2 h-full p-5 mx-auto text-white border-2 border-white/5 rounded-xl bg-black/25 backdrop-blur-sm">
       <article className="flex justify-between">
@@ -36,25 +42,35 @@ function TaskList() {
         </div>
         <div className="flex flex-col items-end gap-2 m-6 my-4 justify-top">
           <ul className="text-xs bg-transparent menu menu-horizontal backdrop-blur-sm rounded-box">
-            <li>
-              <button
-                onClick={formNewTask}
-                className="tooltip tooltip-top"
-                data-tip="Nueva Tarea"
-              >
-                <ClipboardPlus size={16} />
-              </button>
-            </li>
-            <li>
-              <button className="tooltip tooltip-top" data-tip="Buscar">
-                <Search size={16} />
-              </button>
-            </li>
-            <li>
-              <button className="tooltip tooltip-top" data-tip="Salir">
-                <LogOut size={16} />
-              </button>
-            </li>
+            {loading ? (
+              "Cargando... "
+            ) : (
+              <>
+                <li>
+                  <button
+                    onClick={formNewTask}
+                    className="tooltip tooltip-top"
+                    data-tip="Nueva Tarea"
+                  >
+                    <ClipboardPlus size={16} />
+                  </button>
+                </li>
+                <li>
+                  <button className="tooltip tooltip-top" data-tip="Buscar">
+                    <Search size={16} />
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => handleLogout()}
+                    className="tooltip tooltip-top"
+                    data-tip="Salir"
+                  >
+                    <LogOut size={16} />
+                  </button>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </article>
@@ -66,7 +82,7 @@ function TaskList() {
         >
           <TaskForm setFormTask={setFormTask} />
         </div>
-        <TaskCard todos={tasks} />
+        <TaskCard todos={tasks} loading={loading} />
       </article>
       <Footer items={tasks} allItems={allTask} />
     </section>

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useTodo } from "../../context/TodoContext.jsx";
+import { TodoContext } from "../../context/TodoContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { CircleCheck } from "lucide-react";
 
@@ -15,15 +15,15 @@ function InitialPage() {
   const [progress, setProgress] = useState(0);
   const [tasks, setTask] = useState([]);
   const [showAlert, setShowAlert] = useState(false);
-  const { tasksFetch, loading: tasksLoading } = useTodo();
+  const { tasksFetch, loading: tasksLoading } = useContext(TodoContext);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && tasksFetch) {
+    if (!loading) {
       setTask(tasksFetch);
     }
-  }, [tasksLoading, tasksFetch]);
+  }, [tasksLoading]);
 
   const onSubmit = (data) => {
     setLoading(true);
@@ -42,9 +42,11 @@ function InitialPage() {
         return oldProgress + 20;
       });
     }, 1000);
+    return () => clearInterval(interval);
   };
 
   const handleShowAlert = () => {
+    if (showAlert) return;
     setShowAlert(true);
     setTimeout(() => {
       setShowAlert(false); // Oculta el alerta después de 3 segundos
@@ -85,7 +87,14 @@ function InitialPage() {
               tasks ? "hover:bg-blue-600" : "hover:bg-blue-500"
             }`}
           >
-            {loading ? "Guardando..." : "Ingresar"}
+            {loading ? (
+              <p>
+                <span className="loading loading-spinner loading-xs me-1"></span>
+                Inicializando app
+              </p>
+            ) : (
+              "Ingresar"
+            )}
           </button>
         </form>
         {loading && (
