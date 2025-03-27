@@ -2,9 +2,9 @@ import { Trash2 } from "lucide-react";
 import { useModal } from "../../context/ModalContext.jsx";
 import { TodoContext } from "../../context/TodoContext.jsx";
 import { useAlert } from "../../context/AlertContext.jsx";
-import { useContext } from "react";
+import { memo, useContext } from "react";
 
-export const Todo = ({ task }) => {
+export const Todo = memo(({ task }) => {
   const { id, title, description, completed } = task;
   const { showAlert } = useAlert();
   const { openModal } = useModal();
@@ -57,4 +57,6 @@ export const Todo = ({ task }) => {
       </button>
     </div>
   );
-};
+});
+
+Todo.displayName = "Todo";

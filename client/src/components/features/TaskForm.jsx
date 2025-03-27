@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { TodoContext } from "../../context/TodoContext.jsx";
 import { useAlert } from "../../context/AlertContext.jsx";
 
-function TaskForm({ setFormTask }) {
+const TaskForm = React.memo(function TaskForm({ setFormTask, setIsExiting }) {
   const [hasContent, setHasContent] = useState(false);
   const { showAlert } = useAlert();
   const { addTask } = useContext(TodoContext);
@@ -38,7 +38,11 @@ function TaskForm({ setFormTask }) {
     const res = await addTask(newTask);
 
     if (res.success) {
-      setFormTask(false);
+      setIsExiting(true);
+      setTimeout(() => {
+        setIsExiting(false);
+        setFormTask(false);
+      }, 500);
       reset();
       showAlert("success", "Tarea creada con exito!");
     } else {
@@ -47,9 +51,14 @@ function TaskForm({ setFormTask }) {
   };
 
   const handleCancel = () => {
-    setFormTask(false);
+    setIsExiting(true);
+    setTimeout(() => {
+      setIsExiting(false);
+      setFormTask(false);
+    }, 500);
     reset();
   };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex w-full gap-4">
       <div className="flex flex-col w-full gap-2">
@@ -113,6 +122,6 @@ function TaskForm({ setFormTask }) {
       </button>
     </form>
   );
-}
+});
 
 export default TaskForm;

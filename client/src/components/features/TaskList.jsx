@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import TaskCard from "./TaskCard.jsx";
 import Footer from "../layout/Footer.jsx";
 import { ClipboardPlus, LogOut, Search } from "lucide-react";
@@ -7,26 +7,53 @@ import { TodoContext } from "../../context/TodoContext.jsx";
 import { useNavigate } from "react-router-dom";
 
 function TaskList() {
-  const { tasksFetch, loading } = useContext(TodoContext);
+  const { tasksFetch, filteredTask, loading } = useContext(TodoContext);
   const [tasks, setTasks] = useState([]);
   const [allTask, setAllTasks] = useState([]);
   const [formTask, setFormTask] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
 
   const navigate = useNavigate();
   useEffect(() => {
     if (!loading) {
       setAllTasks(tasksFetch);
-
-      const pendingTask = tasksFetch.filter((t) => !t.completed);
-      setTasks(pendingTask);
     }
-  }, [tasksFetch]);
+  }, [tasksFetch, loading]);
+
+  useEffect(() => {
+    if (!loading) {
+      setTasks(filteredTask);
+    }
+  }, [filteredTask, loading]);
 
   const userName = localStorage.getItem("nombreUsuario");
 
-  const formNewTask = () => {
-    setFormTask(true);
-  };
+  useEffect(() => {
+    let timeoutId;
+    if (formTask === false && isExiting) {
+      timeoutId = setTimeout(() => {
+        setIsExiting(false);
+      }, 400);
+    }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [formTask, isExiting]);
+
+  const formNewTask = useCallback(() => {
+    if (formTask) {
+      // Cuando se está cerrando
+      setIsExiting(true);
+
+      setTimeout(() => {
+        setFormTask(false);
+      }, 500);
+    } else {
+      // Cuando se está abriendo
+      setFormTask(true);
+    }
+  }, [formTask]);
 
   const handleLogout = () => {
     localStorage.removeItem("nombreUsuario");
@@ -74,14 +101,18 @@ function TaskList() {
           </ul>
         </div>
       </article>
+      <div
+        className={`${
+          formTask
+            ? "flex animate-scale-in-ver-top"
+            : isExiting
+            ? "flex animate-scale-out-ver-top"
+            : "hidden"
+        } gap-2 my-2 transition-all`}
+      >
+        <TaskForm setFormTask={setFormTask} setIsExiting={setIsExiting} />
+      </div>
       <article className="overflow-y-scroll h-3/4">
-        <div
-          className={`${
-            formTask ? "flex" : "hidden"
-          } gap-2 mr-2 transition-all animate-scale-in-ver-top`}
-        >
-          <TaskForm setFormTask={setFormTask} />
-        </div>
         <TaskCard todos={tasks} loading={loading} />
       </article>
       <Footer items={tasks} allItems={allTask} />

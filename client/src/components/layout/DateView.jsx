@@ -8,7 +8,7 @@ function DateView() {
   useEffect(() => {
     const timerID = setInterval(() => {
       setTime(new Date());
-    }, 1000);
+    }, 7000);
 
     return () => {
       clearInterval(timerID);

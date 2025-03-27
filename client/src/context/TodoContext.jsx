@@ -189,24 +189,23 @@ export function TodoProvider({ children }) {
     }
   };
 
-  return (
-    <TodoContext.Provider
-      value={{
-        tasksFetch,
-        filteredTask,
-        loading,
-        error,
-        setFilter,
-        toggleComplete,
-        removeTask,
-        addTask,
-        getOne,
-        updateTask,
-      }}
-    >
-      {children}
-    </TodoContext.Provider>
+  const value = useMemo(
+    () => ({
+      tasksFetch,
+      filteredTask,
+      loading,
+      error,
+      setFilter,
+      toggleComplete,
+      removeTask,
+      addTask,
+      getOne,
+      updateTask,
+    }),
+    [tasksFetch, filteredTask, loading, error]
   );
+
+  return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;
 }
 
 export { TodoContext };

@@ -2,7 +2,7 @@ import React from "react";
 import { Todo } from "./ToDo.jsx";
 import CardSkeleton from "../utils/CardSkeleton.jsx";
 
-function TaskCard({ todos, loading }) {
+const TaskCard = React.memo(({ todos, loading }) => {
   const classCompleted = "text-white/50 line-through bg-white/10";
 
   if (loading) {
@@ -23,6 +23,6 @@ function TaskCard({ todos, loading }) {
       ))}
     </ul>
   );
-}
+});
 
 export default TaskCard;
